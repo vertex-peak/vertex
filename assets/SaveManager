@@ -1,8 +1,8 @@
 local HttpService = game:GetService("HttpService")
-local name = "nexus-001"
+local name = "vertex-001"
 
 local SaveManager = {} do
-	SaveManager.Folder = "nexus-001"
+	SaveManager.Folder = "vertex-001"
 	SaveManager.Ignore = {}
 	SaveManager.Parser = {
 		Toggle = {
