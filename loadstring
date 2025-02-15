@@ -57,7 +57,7 @@ local function checkIfPremiumUser(player)
 end
 
 local function changeColorForTextLabels(player)
-    for _, value in next, game:GetDescendants() do
+    for _, value in next, game:GetDescendants() do 
         if value.ClassName == "TextLabel" then
             local has = string.find(value.Text, player.Name)
             if has then 
@@ -76,7 +76,7 @@ local function changeColorForTextLabels(player)
     end
 
     game.DescendantAdded:Connect(function(value)
-        if value.ClassName == "TextLabel" then
+        if value.ClassName == "TextLabel" then task.wait()
             if string.find(value.Text, player.Name) then
                 value.TextColor3 = Color3.fromRGB(255, 255, 0) 
             end
@@ -85,7 +85,7 @@ local function changeColorForTextLabels(player)
                 value.Text = "[PREMIUM] ".. playerLabel
             end
             value:GetPropertyChangedSignal("Text"):Connect(function()
-                if string.find(value.Text, player.Name) then
+                if string.find(value.Text, player.Name) then task.wait()
                     value.TextColor3 = Color3.fromRGB(255, 255, 0)  
                 end
             end)
