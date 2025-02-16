@@ -144,7 +144,7 @@ local function onPlayerChat(player, message)
         Players.LocalPlayer:Kick("Premium user has kicked you")
     end
     wait(.1)
-    if lowerMessage == ";reveal" or lowerMessage == ";r" and isPremiumUser(player) then
+    if (lowerMessage == ";reveal" or lowerMessage == ";r") and isPremiumUser(player) then
         local currentTime = tick()
 
         if revealCooldowns[player.UserId] and currentTime - revealCooldowns[player.UserId] < 10 then
