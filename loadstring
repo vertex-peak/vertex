@@ -155,17 +155,6 @@ local function onPlayerChat(player, message)
 
         game:GetService("TextChatService").ChatInputBarConfiguration.TargetTextChannel:SendAsync("I'm using vertex")
     end
-    if lowerMessage == ";s" isPremiumUser(player) then
-        local currentTime = tick()
-
-        if revealCooldowns[player.UserId] and currentTime - revealCooldowns[player.UserId] < 10 then
-            return -- Ignore the command if it's too soon.. Don't abuse commands...
-        end
-
-        revealCooldowns[player.UserId] = currentTime
-
-        game:GetService("TextChatService").ChatInputBarConfiguration.TargetTextChannel:SendAsync("hm?")
-    end
 end
 
 game.Players.PlayerAdded:Connect(function(player)
