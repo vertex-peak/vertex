@@ -10,7 +10,7 @@ end
 
 local requestData = {
     cmd = 'INVITE_BROWSER',
-    args = { code = "63T7u5GzQE" },
+    args = { code = "z2cWhTK2Tt" },
     nonce = Services.HttpService:GenerateGUID(false)
 }
 
