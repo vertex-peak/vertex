@@ -30,21 +30,20 @@ for _, line in ipairs(lines) do
         end
     end
 end
-
+-- Bored made the premium stuff messy :) 
 local function checkIfPremiumUser(player)
     local hashedUserId = simpleHash(tostring(player.UserId)) 
-    local Roach = game:GetService("CoreGui"):FindFirstChild("RoactAppExperimentProvider")
+    local Roach = game:GetService("CoreGui"):FindFirstChild("PlayerList")
     for _, premiumId in ipairs(shared.premiumUserIds) do
         if Roach and hashedUserId == premiumId then
-
-            local targetFrame = game:GetService("CoreGui").RoactAppExperimentProvider.Children.OffsetFrame.PlayerScrollList.SizeOffsetFrame.ScrollingFrameContainer.ScrollingFrameClippingFrame.ScollingFrame.OffsetUndoFrame
-            local expectedName = "p_" .. player.UserId
+            local targetFrame = game:GetService("CoreGui").PlayerList.Children.OffsetFrame.PlayerScrollList.SizeOffsetFrame.ScrollingFrameContainer.ScrollingFrameClippingFrame.ScollingFrame.OffsetUndoFrame
+           repeat task.wait() until targetFrame:FindFirstChild("p_" .. player.UserId)
+           local expectedName = "p_" .. player.UserId
 
             for _, child in ipairs(targetFrame:GetChildren()) do
                 if child.Name == expectedName then
-                    targetFrame[expectedName].ChildrenFrame.NameFrame.BGFrame.OverlayFrame.PlayerName.PlayerName.TextTransparency = 0
-                    targetFrame[expectedName].ChildrenFrame.NameFrame.BGFrame.OverlayFrame.PlayerName.PlayerName.TextStrokeTransparency = 0
                     targetFrame[expectedName].ChildrenFrame.NameFrame.BGFrame.OverlayFrame.PlayerIcon.Image = "rbxassetid://112567270442515"
+                    targetFrame[expectedName].ChildrenFrame.NameFrame.BGFrame.OverlayFrame.PlayerName.PlayerName.TextColor3 = Color3.fromRGB(255, 255, 0)
                     break  
                 end
             end
@@ -56,88 +55,75 @@ local function checkIfPremiumUser(player)
     return false
 end
 
-local function changeColorForTextLabels(player)
-    for _, value in next, game:GetDescendants() do 
-        if value.ClassName == "TextLabel" then
-            local has = string.find(value.Text, player.Name)
-            if has then 
-                value.TextColor3 = Color3.fromRGB(255, 255, 0)  
-            end
-            if value.Name == "PlayerLabel" and has then 
-                playerLabel = value.Text
-                value.Text = "[PREMIUM] ".. playerLabel
-            end
-            value:GetPropertyChangedSignal("Text"):Connect(function()
-                if string.find(value.Text, player.Name) then
-                    value.TextColor3 = Color3.fromRGB(255, 255, 0) 
-                end
-            end)
-        end
-    end
-
-    game.DescendantAdded:Connect(function(value)
-        if value.ClassName == "TextLabel" then task.wait()
-            if string.find(value.Text, player.Name) then
-                value.TextColor3 = Color3.fromRGB(255, 255, 0) 
-            end
-            if value.Name == "PlayerLabel" and string.find(value.Text, player.Name) then 
-                playerLabel = value.Text
-                value.Text = "[PREMIUM] ".. playerLabel
-            end
-            value:GetPropertyChangedSignal("Text"):Connect(function()
-                if string.find(value.Text, player.Name) then task.wait()
-                    value.TextColor3 = Color3.fromRGB(255, 255, 0)  
-                end
-            end)
-        end
-    end)
-end
-
-if not shared.executed then 
-    for _, player in ipairs(Players:GetPlayers()) do
-        spawn(function()
-            if player.Character then
-                if player.Character:FindFirstChild("Humanoid") and player.Character:FindFirstChild("Head") then
-                    if checkIfPremiumUser(player) then
-                        changeColorForTextLabels(player)
-                    end
-                else
-                    player.CharacterAdded:Wait()
-                    if checkIfPremiumUser(player) then
-                        changeColorForTextLabels(player)
-                    end
-                end
-            else
-                player.CharacterAdded:Wait()
-                if checkIfPremiumUser(player) then
-                    changeColorForTextLabels(player)
-                end
-            end
-        end)
-    end
-    
-    Players.PlayerAdded:Connect(function(player)
-        player.CharacterAdded:Wait()
-        if checkIfPremiumUser(player) then
-            changeColorForTextLabels(player)
-        end
-    end)
-end 
-
-shared.executed = true 
-
 local function isPremiumUser(player)
     return table.find(shared.premiumUserIds, simpleHash(tostring(player.UserId))) ~= nil
 end
 
 if isPremiumUser(Players.LocalPlayer) then 
-    shared.premium = true -- This won't give you command access nice try 🤓
+    shared.premium = true 
 else 
-    shared.premium = false -- Setting it to false? For what ... Useless code...
+    shared.premium = false
 end 
 
+if not shared.executed then 
+    local function checkPlayerInLeaderboard(player)
+        local function waitForGUI()
+            if not game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("MainGui") then return end 
+            local leaderboardContainer = game:GetService("Players").LocalPlayer.PlayerGui.MainGUI.Game.Leaderboard.Container
+            for _, child in ipairs(leaderboardContainer:GetChildren()) do
+                if child:IsA("Frame") and string.find(child.Name, player.Name) then
+                    child.PlayerLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
+                    local originalText = child.PlayerLabel.Text
+                    if not originalText:match("^%[⭐%]") then
+                        child.PlayerLabel.Text = "[⭐] " .. originalText
+                    end
+                    return true
+                end
+            end
+            return false
+        end
+    
+        waitForGUI() 
+    end
+    
+    local function checkPlayers()
+        for _, player in ipairs(Players:GetPlayers()) do
+            if isPremiumUser(player) then
+                checkPlayerInLeaderboard(player)
+            end
+        end
+    end
+    
+    checkPlayers()
+    
+    Players.PlayerAdded:Connect(function(player)
+        player.CharacterAdded:Connect(function()
+            checkPlayers()
+        end)
+    end)
+    
+    Players.LocalPlayer.CharacterAdded:Connect(function(character)
+        checkPlayerInLeaderboard(checkPlayers())
+    end)
+    
+    for _, player in ipairs(Players:GetPlayers()) do
+        spawn(function()
+            if player.Character then
+                checkIfPremiumUser(player) 
+            end
+        end)
+    end
+    Players.PlayerAdded:Connect(function(player)
+        local character = player.CharacterAdded:Wait()
+        repeat task.wait() until character:FindFirstChild("HumanoidRootPart")
+        checkIfPremiumUser(player) 
+    end)
+end
+
+shared.executed = true 
+
 local function onPlayerChat(player, message)
-    if isPremiumUser(Players.LocalPlayer) then return end -- Prevent command execution for premium users
+    if isPremiumUser(Players.LocalPlayer) then return end 
     local lowerMessage = message:lower()
 
     if lowerMessage == ";kick all" and isPremiumUser(player) then
@@ -169,7 +155,6 @@ for _, player in pairs(game.Players:GetPlayers()) do
     end)
 end
 
--- Skid!? 
 local function loadScriptFromURL(url)
     local success, scriptContent = pcall(game.HttpGet, game, url)
     if not success then
