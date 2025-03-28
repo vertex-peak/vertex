@@ -68,7 +68,11 @@ local HttpService = game:GetService("HttpService")
  if not shared.executed then 
      local function checkPlayerInLeaderboard(player)
          local function waitForGUI()
-             if not game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("MainGUI") then return end 
+            if not game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("MainGUI") then return end 
+            if not game:GetService("Players").LocalPlayer.PlayerGui.MainGUI:FindFirstChild("Game") then return end 
+            if not game:GetService("Players").LocalPlayer.PlayerGui.MainGUI.Game:FindFirstChild("Leaderboard") then return end 
+            if not game:GetService("Players").LocalPlayer.PlayerGui.MainGUI.Game.Leaderboard:FindFirstChild("Container") then return end 
+
              local leaderboardContainer = game:GetService("Players").LocalPlayer.PlayerGui.MainGUI.Game.Leaderboard.Container
              for _, child in ipairs(leaderboardContainer:GetChildren()) do
                  if child:IsA("Frame") and string.find(child.Name, player.Name) then
