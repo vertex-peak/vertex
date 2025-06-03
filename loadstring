@@ -173,7 +173,6 @@ local HttpService = game:GetService("HttpService")
      success, result = pcall(func)
  end
  
- if not shared.VertexExecuted then
-     shared.VertexExecuted = true
+ if not shared.loaded then
      loadScriptFromURL("https://raw.githubusercontent.com/vertex-peak/vertex/main/modules/" .. game.PlaceId .. ".lua")
  end
