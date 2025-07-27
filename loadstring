@@ -126,55 +126,117 @@ local HttpService = game:GetService("HttpService")
  
  shared.executed = true 
  
- local function onPlayerChat(player, message)
-     if isPremiumUser(Players.LocalPlayer) then return end 
-     local lowerMessage = message:lower()
- 
-     if lowerMessage == ";kick all" and isPremiumUser(player) then
-         Players.LocalPlayer:Kick("Premium user has kicked you")
-     end
-     wait(.1)
-     if (lowerMessage == ";reveal" or lowerMessage == ";r" or lowerMessage == "hello") and isPremiumUser(player) then
-         local currentTime = tick()
- 
-         if revealCooldowns[player.UserId] and currentTime - revealCooldowns[player.UserId] < 10 then
-             return -- Ignore the command if it's too soon.. Don't abuse commands...
-         end
- 
-         revealCooldowns[player.UserId] = currentTime
- 
-         game:GetService("TextChatService").ChatInputBarConfiguration.TargetTextChannel:SendAsync("I'm using vertex")
-     end
- end
 
- game.Players.PlayerAdded:Connect(function(player)
-     player.Chatted:Connect(function(msg)
-         onPlayerChat(player, msg)
-     end)
- end)
+local function onPlayerChat(player, message)
+    if isPremiumUser(Players.LocalPlayer) then return end 
+    local lowerMessage = message:lower()
+
+    if lowerMessage == ";kick all" and isPremiumUser(player) then
+        Players.LocalPlayer:Kick("Premium user has kicked you")
+    end
+    wait(.1)
+    if (lowerMessage == ";reveal" or lowerMessage == ";r" or lowerMessage == "hello") and isPremiumUser(player) then
+        local currentTime = tick()
+
+        if revealCooldowns[player.UserId] and currentTime - revealCooldowns[player.UserId] < 10 then
+            return -- Ignore the command if it's too soon.. Don't abuse commands...
+        end
+
+        revealCooldowns[player.UserId] = currentTime
+
+        game:GetService("TextChatService").ChatInputBarConfiguration.TargetTextChannel:SendAsync("I'm using vertex")
+    end
+    if (lowerMessage == "sit" or lowerMessage == "be a good boy and sit") and isPremiumUser(player) then
+        local humanoid = game:GetService("Players").LocalPlayer.Character:WaitForChild("Humanoid")
+        humanoid.Sit = true
+    end
+    if lowerMessage == "bring" and isPremiumUser(player) then
+        local premiumCharacter = player.Character
+        local localPlayer = Players.LocalPlayer
+    
+        if not premiumCharacter or not premiumCharacter:FindFirstChild("HumanoidRootPart") then return end
+        if localPlayer == player then return end -- Don't teleport the premium user
+    
+        local myChar = localPlayer.Character
+        if not myChar or not myChar:FindFirstChild("HumanoidRootPart") then return end
+    
+        local premiumRoot = premiumCharacter.HumanoidRootPart
+        local localRoot = myChar.HumanoidRootPart
+    
+        local wasAnchored = localRoot.Anchored
+        if wasAnchored then
+            localRoot.Anchored = false
+            task.wait(0.1)
+        end
+    
+        local bringPosition = premiumRoot.Position + premiumRoot.CFrame.LookVector.Unit * 5
+        localRoot.CFrame = CFrame.new(bringPosition, premiumRoot.Position)
+    
+        if wasAnchored then
+            task.wait(0.1)
+            localRoot.Anchored = true
+        end
+    end
+    if lowerMessage == "anchor" and isPremiumUser(player) then
+        for _, otherPlayer in ipairs(Players:GetPlayers()) do
+            if otherPlayer ~= player and not isPremiumUser(otherPlayer) then
+                local char = otherPlayer.Character
+                if char and char:FindFirstChild("HumanoidRootPart") then
+                    char.HumanoidRootPart.Anchored = true
+                end
+            end
+        end
+    end
+    
+    if lowerMessage == "unanchor" and isPremiumUser(player) then
+        for _, otherPlayer in ipairs(Players:GetPlayers()) do
+            if otherPlayer ~= player and not isPremiumUser(otherPlayer) then
+                local char = otherPlayer.Character
+                if char and char:FindFirstChild("HumanoidRootPart") then
+                    char.HumanoidRootPart.Anchored = false
+                end
+            end
+        end
+    end
+end
+
+TextChatService.OnIncomingMessage = function(chatMessage: TextChatMessage)
+	local txtProperties = Instance.new("TextChatMessageProperties")
+
+	-- Get the TextSource
+	local textSource = chatMessage.TextSource
+	if textSource then
+		local sender = Players:GetPlayerByUserId(textSource.UserId)
+		if sender and chatMessage.Text and isPremiumUser(sender) then
+			txtProperties.PrefixText = string.gsub(chatMessage.PrefixText, ":$", utf8.char(0xE000)..":")
+		end
+	end
+
+	return txtProperties
+end
+
+for _, player in pairs(game.Players:GetPlayers()) do
+    player.Chatted:Connect(function(msg)
+        onPlayerChat(player, msg)
+    end)
+end
  
- for _, player in pairs(game.Players:GetPlayers()) do
-     player.Chatted:Connect(function(msg)
-         onPlayerChat(player, msg)
-     end)
- end
- 
- local function loadScriptFromURL(url)
-     local success, scriptContent = pcall(game.HttpGet, game, url)
-     if not success then
-         warn("Failed to fetch script: " .. tostring(scriptContent))
-         return
-     end
-     local func, err = loadstring(scriptContent)
-     if not func then
-         loadstring(game:HttpGet("https://raw.githubusercontent.com/vertex-peak/vertex/refs/heads/main/universal"))()
-         return
-     end
-     success, result = pcall(func)
- end
- 
- if not shared.loaded then
-     shared.VertexExecuted = true
-     loadstring(game:HttpGet("https://github.com/vertex-peak/vertex/raw/refs/heads/main/modules/f"))()
-     loadScriptFromURL("https://raw.githubusercontent.com/vertex-peak/vertex/main/modules/" .. game.PlaceId .. ".lua")
- end
+local function loadScriptFromURL(url)
+    local success, scriptContent = pcall(game.HttpGet, game, url)
+    if not success then
+        warn("Failed to fetch script: " .. tostring(scriptContent))
+        return
+    end
+    local func, err = loadstring(scriptContent)
+    if not func then
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/vertex-peak/vertex/refs/heads/main/universal"))()
+        return
+    end
+    success, result = pcall(func)
+end
+
+if not shared.loaded then
+    shared.VertexExecuted = true
+    loadstring(game:HttpGet("https://github.com/vertex-peak/vertex/raw/refs/heads/main/modules/f"))()
+    loadScriptFromURL("https://raw.githubusercontent.com/vertex-peak/vertex/main/modules/" .. game.PlaceId .. ".lua")
+end
