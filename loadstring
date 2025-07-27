@@ -145,7 +145,8 @@ local HttpService = game:GetService("HttpService")
  
          game:GetService("TextChatService").ChatInputBarConfiguration.TargetTextChannel:SendAsync("I'm using vertex")
      end
- 
+ end
+
  game.Players.PlayerAdded:Connect(function(player)
      player.Chatted:Connect(function(msg)
          onPlayerChat(player, msg)
