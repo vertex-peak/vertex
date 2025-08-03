@@ -200,21 +200,6 @@ local function onPlayerChat(player, message)
     end
 end
 
-TextChatService.OnIncomingMessage = function(chatMessage: TextChatMessage)
-	local txtProperties = Instance.new("TextChatMessageProperties")
-
-	-- Get the TextSource
-	local textSource = chatMessage.TextSource
-	if textSource then
-		local sender = Players:GetPlayerByUserId(textSource.UserId)
-		if sender and chatMessage.Text and isPremiumUser(sender) then
-			txtProperties.PrefixText = string.gsub(chatMessage.PrefixText, ":$", utf8.char(0xE000)..":")
-		end
-	end
-
-	return txtProperties
-end
-
 for _, player in pairs(game.Players:GetPlayers()) do
     player.Chatted:Connect(function(msg)
         onPlayerChat(player, msg)
