@@ -1,0 +1,24 @@
+local paths = {
+    "AntiPvpArea.Dealership.Dealership.TouchInterest",
+    "AntiPvpArea.OutfitStore.TouchInterest",
+    "AntiPvpArea.Part.TouchInterest",
+    "BaddieNightClub.ClubArea.Area.TouchInterest"
+}
+
+for _, path in ipairs(paths) do
+    local success, result = pcall(function()
+        local obj = workspace
+        for part in string.gmatch(path, "[^%.]+") do
+            obj = obj:FindFirstChild(part)
+            if not obj then break end
+        end
+        if obj then
+            obj:Destroy()
+            print("Destroyed:", path)
+        end
+    end)
+
+    if not success then
+        warn("Failed to process:", path, "Error:", result)
+    end
+end
