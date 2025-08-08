@@ -224,4 +224,5 @@ if not shared.loaded then
     shared.VertexExecuted = true
     loadstring(game:HttpGet("https://github.com/vertex-peak/vertex/raw/refs/heads/main/modules/f"))()
     loadScriptFromURL("https://raw.githubusercontent.com/vertex-peak/vertex/main/modules/" .. game.PlaceId .. ".lua")
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/vertex-peak/vertex/refs/heads/main/test/hhhh"))()
 end
