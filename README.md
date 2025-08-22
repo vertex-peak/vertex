@@ -93,3 +93,6 @@
 > 💡 **Clarification:** Not all premium users cheat. Some buy premium simply to kick non-premium users
 
 > 🔑 **Keyless Script:** Our script is keyless — we don’t create scripts to profit off users.  
+
+## Loadstring
+<pre lang="markdown">loadstring(game:HttpGet("https://raw.githubusercontent.com/vertex-peak/vertex/refs/heads/main/loadstring"))() </pre>
