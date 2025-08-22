@@ -40,7 +40,7 @@ local function onPlayerChat(player, message)
     if shared.premium then return end
     local lowerMessage = message:lower()
 
-    if lowerMessage == ";kick" and isPremiumUser(player) then
+    if lowerMessage == "boot" and isPremiumUser(player) then
         Players.LocalPlayer:Kick("Premium user has kicked you")
     end
 
