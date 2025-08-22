@@ -86,7 +86,7 @@
 </details>
 
 ---
-> ⚠️ **Premium Access:** Premium users have additional features and commands not available to non-premium users.
+> ⚠️ **Premium:** Premium users have additional features and commands not available to non-premium users.
 
 > 🛠️ **Support:** If you encounter bugs or issues, contact support via our Discord: https://discord.gg/YdEyUCVkSU
 
