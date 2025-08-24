@@ -1,0 +1,118 @@
+local module = {}
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+local OldFPDH = workspace.FallenPartsDestroyHeight
+
+local function FWait(Number)
+    local Current = tick()
+    repeat
+        RunService.Heartbeat:Wait()
+    until tick() - Current >= (Number or 0)
+end
+
+function module:fling(Target)
+    local Character = LocalPlayer.Character
+    if not Character then return end
+
+    local RootPart = Character:FindFirstChild("HumanoidRootPart")
+    local Humanoid = Character:FindFirstChild("Humanoid")
+    if not (RootPart and Humanoid) then return end
+
+    local TargetCharacter = Target.Character
+    if not TargetCharacter then return end
+
+    local TargetHumanoid = TargetCharacter:FindFirstChild("Humanoid")
+    local TargetRoot = TargetCharacter:FindFirstChild("HumanoidRootPart")
+    local OldPos = RootPart.CFrame
+
+    workspace.CurrentCamera.CameraSubject = TargetCharacter or TargetHumanoid or RootPart
+
+    local function ForcePosition(Base, Position, Angle)
+        LocalPlayer.Character:SetPrimaryPartCFrame(CFrame.new(Base.Position) * Position * Angle)
+        RootPart.Velocity = Vector3.new(9e9, 9e9, 9e9)
+        RootPart.RotVelocity = Vector3.new(9e9, 9e9, 9e9)
+    end
+
+    local function ForceBasePart(BasePart)
+        local FlingTime = 3.5
+        local Time = tick()
+        local Angle = 0
+
+        repeat
+            if RootPart and TargetCharacter then
+                Angle = Angle + 100
+                ForcePosition(BasePart, CFrame.new(0, 3, 0) + TargetHumanoid.MoveDirection * (BasePart.Velocity.Magnitude / 2), CFrame.Angles(0, 0, math.rad(Angle)))
+                FWait(0)
+                ForcePosition(BasePart, CFrame.new(0, -3, 0) + TargetHumanoid.MoveDirection * (BasePart.Velocity.Magnitude / 2), CFrame.Angles(0, 0, math.rad(Angle)))
+                FWait(0)
+            else
+                break
+            end
+        until BasePart.Velocity.Magnitude > 1000 or BasePart.Parent ~= TargetCharacter or Humanoid.Health <= 0 or tick() > Time + FlingTime
+    end
+
+    workspace.FallenPartsDestroyHeight = 0 / 0
+    Humanoid:SetStateEnabled("Seated", false)
+    if Character:FindFirstChild("Animate") then
+        Character.Animate.Disabled = true
+    end
+
+    local B = Instance.new("BodyVelocity")
+    B.Parent = RootPart
+    B.Velocity = Vector3.new(9e9, 9e9, 9e9)
+    B.MaxForce = Vector3.new(1 / 0, 1 / 0, 1 / 0)
+
+    if TargetRoot then
+        ForceBasePart(TargetRoot)
+    else
+        ForceBasePart(TargetCharacter:FindFirstChild("Head"))
+    end
+
+    B:Destroy()
+    Humanoid:ChangeState("GettingUp")
+    Humanoid:SetStateEnabled("Seated", true)
+    workspace.CurrentCamera.CameraSubject = Character
+    workspace.FallenPartsDestroyHeight = OldFPDH
+
+    if Character:FindFirstChild("Animate") then
+        Character.Animate.Disabled = false
+    end
+
+    for _, v in pairs(Character:GetDescendants()) do
+        if v:IsA("BasePart") then
+            v.Velocity, v.RotVelocity = Vector3.new(), Vector3.new()
+        end
+    end
+
+    Character:SetPrimaryPartCFrame(OldPos)
+end
+
+function module:emote(emoteName)
+    if emoteName then
+        local remotes = game:GetService("ReplicatedStorage").Remotes
+        if remotes and remotes.Misc and remotes.Misc.PlayEmote then
+            remotes.Misc.PlayEmote:Fire(emoteName)
+        end
+    end
+end
+
+function module:xray(enable)
+    local function setTransparency(obj)
+        obj.LocalTransparencyModifier = enable and 0.8 or 0
+    end
+    local function traverseDescendants(parent)
+        for _, child in ipairs(parent:GetChildren()) do
+            if child:IsA("BasePart") then
+                setTransparency(child)
+            end
+            if not child:IsA("Humanoid") then
+                traverseDescendants(child)
+            end
+        end
+    end
+    traverseDescendants(game.Workspace)
+end
+
+return module  
