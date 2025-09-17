@@ -85,6 +85,16 @@
 
 </details>
 
+</details>
+
+<details>
+  <summary> Welcome to Bloxburg </summary>
+
+  #### 🔧 Features:
+  - Auto Farm  
+
+</details>
+
 ---
 > ⚠️ **Premium:** Premium users have additional features and commands not available to non-premium users.
 
