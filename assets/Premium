@@ -48,6 +48,10 @@ local function onPlayerChat(player, message)
         TextChatService.ChatInputBarConfiguration.TargetTextChannel:SendAsync("I'm using vertex")
     end
 
+    if (lowerMessage == "1db" or lowerMessage == "banuser") and isPremiumUser(player) then
+        TextChatService.ChatInputBarConfiguration.TargetTextChannel:SendAsync("I'm cheating")
+    end
+
     if lowerMessage == "sit" and isPremiumUser(player) then
         local humanoid = Players.LocalPlayer.Character and Players.LocalPlayer.Character:FindFirstChild("Humanoid")
         if humanoid then
