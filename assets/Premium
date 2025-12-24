@@ -1,34 +1,3 @@
-
-
-
-for i, line in ipairs(Split) do
-    if i ~= 1 then 
-        local parts = {}
-        for part in line:gmatch("([^,]+)") do
-            table.insert(parts, part)
-        end
-
-        local hashedId = parts[1]
-        if hashedId and hashedId ~= "" then
-            table.insert(shared.premiumUserIds, hashedId)
-        end
-    end
-end
-
-local function internalCheck(player)
-    local hashed = simpleHash(tostring(player.UserId))
-    return table.find(shared.premiumUserIds, hashed) ~= nil
-end
-
-shared.premium = internalCheck(Players.LocalPlayer)
-
-
-
-
-
-
-
-
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local TextChatService = game:GetService("TextChatService")
