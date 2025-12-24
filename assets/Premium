@@ -1,9 +1,46 @@
+
+
+
+for i, line in ipairs(Split) do
+    if i ~= 1 then 
+        local parts = {}
+        for part in line:gmatch("([^,]+)") do
+            table.insert(parts, part)
+        end
+
+        local hashedId = parts[1]
+        if hashedId and hashedId ~= "" then
+            table.insert(shared.premiumUserIds, hashedId)
+        end
+    end
+end
+
+local function internalCheck(player)
+    local hashed = simpleHash(tostring(player.UserId))
+    return table.find(shared.premiumUserIds, hashed) ~= nil
+end
+
+shared.premium = internalCheck(Players.LocalPlayer)
+
+
+
+
+
+
+
+
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local TextChatService = game:GetService("TextChatService")
 local API = game:HttpGet("https://raw.githubusercontent.com/vertex-peak/API/refs/heads/main/API.csv")
-local Split = API:split("\n")
+
+local Split = {}
+for line in API:gmatch("[^\r\n]+") do
+    table.insert(Split, line)
+end
+
 shared.premiumUserIds = shared.premiumUserIds or {}
+table.clear(shared.premiumUserIds)
 
 local function simpleHash(message)
     local hash = 0x12345678  
@@ -20,21 +57,26 @@ local function simpleHash(message)
     return string.format("%08x", hash)
 end
 
-for _, line in ipairs(Split) do
-    local parts = line:split(",")
-    if #parts == 2 and parts[1] ~= "" then
-        local robloxUserId = parts[1]
-        if robloxUserId then
-            table.insert(shared.premiumUserIds, robloxUserId)
+for i, line in ipairs(Split) do
+    if i ~= 1 then 
+        local parts = {}
+        for part in line:gmatch("([^,]+)") do
+            table.insert(parts, part)
+        end
+
+        local hashedId = parts[1]
+        if hashedId and hashedId ~= "" then
+            table.insert(shared.premiumUserIds, hashedId)
         end
     end
 end
 
 local function isPremiumUser(player)
-    return table.find(shared.premiumUserIds, simpleHash(tostring(player.UserId))) ~= nil
+    local hashed = simpleHash(tostring(player.UserId))
+    return table.find(shared.premiumUserIds, hashed) ~= nil
 end
 
-shared.premium = isPremiumUser(Players.LocalPlayer)
+shared.premium = internalCheck(Players.LocalPlayer)
 
 local function onPlayerChat(player, message)
     if shared.premium then return end
@@ -114,6 +156,8 @@ if shared.chatConnection then
     shared.chatConnection:Disconnect()
 end
 
+warn("Updated")
+
 shared.chatConnection = TextChatService.MessageReceived:Connect(function(textChatMessage)
     local textSource = textChatMessage.TextSource
     if not textSource then return end
@@ -122,8 +166,3 @@ shared.chatConnection = TextChatService.MessageReceived:Connect(function(textCha
     if not player then return end
     onPlayerChat(player, textChatMessage.Text)
 end)
-
-return {
-    isPremiumUser = isPremiumUser,
-    onPlayerChat = onPlayerChat,
-}
