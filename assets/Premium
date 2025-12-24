@@ -45,7 +45,7 @@ local function isPremiumUser(player)
     return table.find(shared.premiumUserIds, hashed) ~= nil
 end
 
-shared.premium = internalCheck(Players.LocalPlayer)
+shared.premium = isPremiumUser(Players.LocalPlayer)
 
 local function onPlayerChat(player, message)
     if shared.premium then return end
