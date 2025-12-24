@@ -125,8 +125,6 @@ if shared.chatConnection then
     shared.chatConnection:Disconnect()
 end
 
-warn("Updated")
-
 shared.chatConnection = TextChatService.MessageReceived:Connect(function(textChatMessage)
     local textSource = textChatMessage.TextSource
     if not textSource then return end
