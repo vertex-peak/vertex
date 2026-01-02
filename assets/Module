@@ -42,30 +42,41 @@ function module:fling(Target)
         RootPart.RotVelocity = Vector3.new(9e9,9e9,9e9)
     end
 
-    local function ForceBasePart(BasePart)
-        if not (BasePart and BasePart:IsA("BasePart")) then return end
+local function ForceBasePart(BasePart)
+    if not (BasePart and BasePart:IsA("BasePart")) then return end
+    if not TargetHumanoid then return end
 
-        local Start = tick()
-        local Angle = 0
-        local Duration = 3.5
+    local Start = tick()
+    local Duration = 3.5
+    local Angle = 0
 
-        while tick() - Start < Duration do
-            if not (Humanoid.Health > 0) then break end
-            if not BasePart:IsDescendantOf(workspace) then break end
-            if BasePart.Parent ~= TargetCharacter then break end
+    while tick() - Start < Duration do
+        if not (Humanoid and Humanoid.Health > 0) then break end
+        if not (RootPart and RootPart.Parent) then break end
+        if not (BasePart.Parent == TargetCharacter) then break end
+        if not BasePart:IsDescendantOf(workspace) then break end
 
-            Angle += 100
-            local vel = BasePart.AssemblyLinearVelocity.Magnitude
-            local moveOffset = TargetHumanoid.MoveDirection * (vel / 2)
-
-            ForcePosition(BasePart, CFrame.new(0,3,0) + moveOffset, CFrame.Angles(0,0,math.rad(Angle)))
-            FWait()
-            ForcePosition(BasePart, CFrame.new(0,-3,0) + moveOffset, CFrame.Angles(0,0,math.rad(Angle)))
-            FWait()
-
-            if vel > 1000 then break end
+        local vel = 0
+        if BasePart.AssemblyLinearVelocity then
+            vel = BasePart.AssemblyLinearVelocity.Magnitude
         end
+
+        Angle += 100
+        local offset = TargetHumanoid.MoveDirection * (vel / 2)
+
+        if RootPart and Character.PrimaryPart then
+            Character:SetPrimaryPartCFrame(CFrame.new(BasePart.Position) * (CFrame.new(0,3,0) + offset) * CFrame.Angles(0,0,math.rad(Angle)))
+            RootPart.Velocity = Vector3.new(9e9,9e9,9e9)
+            RootPart.RotVelocity = Vector3.new(9e9,9e9,9e9)
+            Character:SetPrimaryPartCFrame(CFrame.new(BasePart.Position) * (CFrame.new(0,-3,0) + offset) * CFrame.Angles(0,0,math.rad(Angle)))
+            RootPart.Velocity = Vector3.new(9e9,9e9,9e9)
+            RootPart.RotVelocity = Vector3.new(9e9,9e9,9e9)
+        end
+
+        FWait()
+        if vel > 1000 then break end
     end
+end
 
     --// Prep
     workspace.FallenPartsDestroyHeight = 0/0
