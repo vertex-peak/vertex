@@ -1,118 +1,110 @@
 local module = {}
 
+--// Services
 local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
 local RunService = game:GetService("RunService")
-local OldFPDH = workspace.FallenPartsDestroyHeight
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local function FWait(Number)
-    local Current = tick()
-    repeat
-        RunService.Heartbeat:Wait()
-    until tick() - Current >= (Number or 0)
+--// Player
+local LocalPlayer = Players.LocalPlayer
+
+--// Utilities
+local function FWait(t)
+    local s = tick()
+    repeat RunService.Heartbeat:Wait() until tick() - s >= (t or 0)
 end
 
+--// Fling
 function module:fling(Target)
+    if not (Target and Target:IsA("Player")) then return end
+
     local Character = LocalPlayer.Character
-    if not Character then return end
+    local TargetCharacter = Target.Character
+    if not (Character and TargetCharacter) then return end
 
     local RootPart = Character:FindFirstChild("HumanoidRootPart")
-    local Humanoid = Character:FindFirstChild("Humanoid")
-    if not (RootPart and Humanoid) then return end
-
-    local TargetCharacter = Target.Character
-    if not TargetCharacter then return end
-
-    local TargetHumanoid = TargetCharacter:FindFirstChild("Humanoid")
+    local Humanoid = Character:FindFirstChildOfClass("Humanoid")
     local TargetRoot = TargetCharacter:FindFirstChild("HumanoidRootPart")
-    local OldPos = RootPart.CFrame
+    local TargetHumanoid = TargetCharacter:FindFirstChildOfClass("Humanoid")
+    if not (RootPart and Humanoid and TargetHumanoid) then return end
 
-    workspace.CurrentCamera.CameraSubject = TargetCharacter or TargetHumanoid or RootPart
+    Character.PrimaryPart = RootPart
+    local OldCFrame = RootPart.CFrame
+    local OldFPDH = workspace.FallenPartsDestroyHeight
 
-    local function ForcePosition(Base, Position, Angle)
-        LocalPlayer.Character:SetPrimaryPartCFrame(CFrame.new(Base.Position) * Position * Angle)
-        RootPart.Velocity = Vector3.new(9e9, 9e9, 9e9)
-        RootPart.RotVelocity = Vector3.new(9e9, 9e9, 9e9)
+    workspace.CurrentCamera.CameraSubject = TargetCharacter
+
+    local function ForcePosition(BasePart, Offset, Angle)
+        if not (BasePart and BasePart:IsA("BasePart")) then return end
+        if not (Character and Character.PrimaryPart) then return end
+        Character:SetPrimaryPartCFrame(CFrame.new(BasePart.Position) * Offset * Angle)
+        RootPart.Velocity = Vector3.new(9e9,9e9,9e9)
+        RootPart.RotVelocity = Vector3.new(9e9,9e9,9e9)
     end
 
     local function ForceBasePart(BasePart)
-        local FlingTime = 3.5
-        local Time = tick()
+        if not (BasePart and BasePart:IsA("BasePart")) then return end
+
+        local Start = tick()
         local Angle = 0
+        local Duration = 3.5
 
-        repeat
-            if RootPart and TargetCharacter then
-                Angle = Angle + 100
-                ForcePosition(BasePart, CFrame.new(0, 3, 0) + TargetHumanoid.MoveDirection * (BasePart.Velocity.Magnitude / 2), CFrame.Angles(0, 0, math.rad(Angle)))
-                FWait(0)
-                ForcePosition(BasePart, CFrame.new(0, -3, 0) + TargetHumanoid.MoveDirection * (BasePart.Velocity.Magnitude / 2), CFrame.Angles(0, 0, math.rad(Angle)))
-                FWait(0)
-            else
-                break
-            end
-        until BasePart.Velocity.Magnitude > 1000 or BasePart.Parent ~= TargetCharacter or Humanoid.Health <= 0 or tick() > Time + FlingTime
+        while tick() - Start < Duration do
+            if not (Humanoid.Health > 0) then break end
+            if not BasePart:IsDescendantOf(workspace) then break end
+            if BasePart.Parent ~= TargetCharacter then break end
+
+            Angle += 100
+            local vel = BasePart.AssemblyLinearVelocity.Magnitude
+            local moveOffset = TargetHumanoid.MoveDirection * (vel / 2)
+
+            ForcePosition(BasePart, CFrame.new(0,3,0) + moveOffset, CFrame.Angles(0,0,math.rad(Angle)))
+            FWait()
+            ForcePosition(BasePart, CFrame.new(0,-3,0) + moveOffset, CFrame.Angles(0,0,math.rad(Angle)))
+            FWait()
+
+            if vel > 1000 then break end
+        end
     end
 
-    workspace.FallenPartsDestroyHeight = 0 / 0
-    Humanoid:SetStateEnabled("Seated", false)
-    if Character:FindFirstChild("Animate") then
-        Character.Animate.Disabled = true
-    end
+    --// Prep
+    workspace.FallenPartsDestroyHeight = 0/0
+    Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated,false)
+    if Character:FindFirstChild("Animate") then Character.Animate.Disabled = true end
 
-    local B = Instance.new("BodyVelocity")
-    B.Parent = RootPart
-    B.Velocity = Vector3.new(9e9, 9e9, 9e9)
-    B.MaxForce = Vector3.new(1 / 0, 1 / 0, 1 / 0)
+    local BV = Instance.new("BodyVelocity")
+    BV.MaxForce = Vector3.new(math.huge,math.huge,math.huge)
+    BV.Velocity = Vector3.new(9e9,9e9,9e9)
+    BV.Parent = RootPart
 
-    if TargetRoot then
-        ForceBasePart(TargetRoot)
-    else
-        ForceBasePart(TargetCharacter:FindFirstChild("Head"))
-    end
+    --// Execute
+    ForceBasePart(TargetRoot or TargetCharacter:FindFirstChild("Head"))
 
-    B:Destroy()
-    Humanoid:ChangeState("GettingUp")
-    Humanoid:SetStateEnabled("Seated", true)
+    --// Cleanup
+    BV:Destroy()
+    Humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
+    Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated,true)
     workspace.CurrentCamera.CameraSubject = Character
     workspace.FallenPartsDestroyHeight = OldFPDH
+    if Character:FindFirstChild("Animate") then Character.Animate.Disabled = false end
 
-    if Character:FindFirstChild("Animate") then
-        Character.Animate.Disabled = false
-    end
-
-    for _, v in pairs(Character:GetDescendants()) do
+    for _,v in ipairs(Character:GetDescendants()) do
         if v:IsA("BasePart") then
-            v.Velocity, v.RotVelocity = Vector3.new(), Vector3.new()
+            v.Velocity = Vector3.zero
+            v.RotVelocity = Vector3.zero
         end
     end
 
-    Character:SetPrimaryPartCFrame(OldPos)
+    Character:SetPrimaryPartCFrame(OldCFrame)
 end
 
-function module:emote(emoteName)
-    if emoteName then
-        local remotes = game:GetService("ReplicatedStorage").Remotes
-        if remotes and remotes.Misc and remotes.Misc.PlayEmote then
-            remotes.Misc.PlayEmote:Fire(emoteName)
-        end
+--// Emote
+function module:emote(name)
+    if not name then return end
+    local r = ReplicatedStorage:FindFirstChild("Remotes")
+    if r and r:FindFirstChild("Misc") and r.Misc:FindFirstChild("PlayEmote") then
+        r.Misc.PlayEmote:Fire(name)
     end
 end
 
-function module:xray(enable)
-    local function setTransparency(obj)
-        obj.LocalTransparencyModifier = enable and 0.8 or 0
-    end
-    local function traverseDescendants(parent)
-        for _, child in ipairs(parent:GetChildren()) do
-            if child:IsA("BasePart") then
-                setTransparency(child)
-            end
-            if not child:IsA("Humanoid") then
-                traverseDescendants(child)
-            end
-        end
-    end
-    traverseDescendants(game.Workspace)
-end
-
-return module  
+return module
