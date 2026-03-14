@@ -1,3 +1,15 @@
+⚠️ Note
+
+Hello to anyone who cracks or reverses obfuscated scripts or whatever you call it.
+
+We just want to ask that you please don’t leak our code. We’ve been working on this project for around 4 years, constantly pushing updates and trying to improve it. Over that time we’ve built a lot of trust in the community and we’re proud of that.
+
+Our main goal has always been to make sure the script works on as many executors as possible. Because of that, we can’t always use the most secure or aggressive obfuscators since they tend to break on low-UNC executors that a lot of people still use.
+
+So yeah, we had to go with a mid-level obfuscator to keep things compatible. It’s not perfect, but it lets more people actually use the script.
+
+All we ask is that you respect the work we’ve put into this and leave our stuff alone instead of leaking it.
+
 ## Supported Games
 
 <details>
