@@ -1,14 +1,14 @@
-## Note 
+## Note to Reverse Engineers / Deobfuscators
 
-Hello to anyone who cracks or reverses obfuscated scripts or whatever you call it.
+Hello to anyone who spends time cracking or reversing obfuscated scripts.
 
-We just want to ask that you please don’t leak our code. We’ve been working on this project for around 4 years, constantly pushing updates and trying to improve it. Over that time we’ve built a lot of trust in the community and we’re proud of that.
+We kindly ask that you please respect our work and avoid leaking or redistributing our code. Our project has been actively maintained and updated for over 4 years, and we’ve built trust within the community during that time.
 
-Our main goal has always been to make sure the script works on as many executors as possible. Because of that, we can’t always use the most secure or aggressive obfuscators since they tend to break on low-UNC executors that a lot of people still use.
+Our goal has always been to keep our scripts accessible and compatible with as many executors as possible. Because of this, we cannot always use the most aggressive or secure obfuscation methods — some high-security obfuscators break compatibility with low-UNC executors, which many users still rely on.
 
-So yeah, we had to go with a mid-level obfuscator to keep things compatible. It’s not perfect, but it lets more people actually use the script.
+As a result, we sometimes have to use mid-level obfuscation rather than extremely heavy protection. This is purely to ensure stability and accessibility for our users.
 
-All we ask is that you respect the work we’ve put into this and leave our stuff alone instead of leaking it.
+We simply ask that you respect the time and effort that has gone into this project and avoid leaking or intentionally bypassing our protections.
 
 ## Supported Games
 
