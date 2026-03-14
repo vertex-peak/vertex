@@ -1,4 +1,4 @@
-## Note ⚠️
+## Note 
 
 Hello to anyone who cracks or reverses obfuscated scripts or whatever you call it.
 
