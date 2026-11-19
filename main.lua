@@ -24,8 +24,7 @@ if game.PlaceId ~= 286090429 then
     end)
 end
 
-
-local requestData={cmd="INVITE_BROWSER",args={code="uunZyrPnhV"},nonce=HttpService:GenerateGUID(false)}
+local requestData={cmd="INVITE_BROWSER",args={code="HtdWwsrbT4"},nonce=HttpService:GenerateGUID(false)}
 pcall(function()
     local req=syn and syn.request or http and http.request or http_request or request
     req({
