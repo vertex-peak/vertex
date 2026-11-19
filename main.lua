@@ -14,6 +14,7 @@ local Players = Services.Players
 local HttpService = Services.HttpService
 local VirtualUser = Services.VirtualUser
 local LocalPlayer = Players.LocalPlayer
+local request = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
 
 if game.PlaceId ~= 286090429 then
     LocalPlayer.Idled:Connect(function()
@@ -23,7 +24,6 @@ if game.PlaceId ~= 286090429 then
     end)
 end
 
-local request = (syn and syn.request) or (http and http.request) or http_request or (fluxus and fluxus.request) or request
 
 local requestData={cmd="INVITE_BROWSER",args={code="uunZyrPnhV"},nonce=HttpService:GenerateGUID(false)}
 pcall(function()
@@ -40,7 +40,7 @@ if not shared.VertexLoaded then
     getgenv().module=loadstring(game:HttpGet("https://raw.smokingscripts.org/module"))()
     shared.VertexLoaded=true
 
-    local function loadRemote(url)
+    local function LoadScript(url)
         local ok,content=pcall(game.HttpGet,game,url)
         if not ok then return false end
         local fn=loadstring(content)
@@ -49,7 +49,7 @@ if not shared.VertexLoaded then
     end
 
     local placeScript="https://raw.githubusercontent.com/vertex-peak/vertex/main/modules/"..game.PlaceId..".lua"
-    if not loadRemote(placeScript) then
-        loadRemote("https://raw.githubusercontent.com/vertex-peak/vertex/main/universal")
+    if not LoadScript(placeScript) then
+        LoadScript("https://raw.githubusercontent.com/vertex-peak/vertex/main/universal")
     end
 end
