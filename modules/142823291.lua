@@ -1008,7 +1008,7 @@ end)
 
 local KillMurderer = shared.Roles:Toggle(
     "KillM",
-    "Kill Murderer (Blatant)"
+    "Kill Murderer (Blatant)",
     function(value)
         if value then
             repeat
